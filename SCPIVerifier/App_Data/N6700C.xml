@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<device name= "string" model= "string" manufacturer= "string">
+ 
+  <!-- This device has only one module in the power supply for demonstration purposes-->
+  <!-- An N6700 can usually hold up four modules-->
+  <initial>
+    <command> "OUTP OFF,(@1)" </command>
+  </initial>
+  <commands>
+    <command cmdName= "Output" scpi= "OUTPut PARAM1 (@1)" >
+      <!-- valid command OUTP ON,(@2)" -->
+      <parameters option="1">
+        <parameter> ON </parameter>
+        <parameter> OFF</parameter>
+      </parameters>
+      <parameters option="2">
+        <parameter default="1"> 1:4 </parameter>
+      </parameters>
+    </command>
+
+    <command cmdName= "Voltage" scpi= "VOLTage:LEVel PARAM1, (@1)" >
+      <!-- valid command OUTP ON,(@2)" -->
+      <parameters option="1">
+        <parameter> 0.0:30.0 </parameter>
+        <parameter default="1"> 1:4 </parameter>
+      </parameters>
+    </command>
+
+    <command cmdName= "Current" scpi= "CURRent:LEVel PARAM1, (@1)" >
+      <!-- valid command OUTP ON,(@2)" -->
+      <parameters option="1">
+        <parameter> 0.0:10.0 </parameter>
+        <parameter default="1"> 1:4 </parameter>
+      </parameters>
+    </command>
+  </commands>
+
+</device>
+
