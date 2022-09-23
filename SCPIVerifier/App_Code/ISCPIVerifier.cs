@@ -14,4 +14,15 @@ public interface ISCPIVerifier
 	[OperationContract]
 	[WebGet(UriTemplate="Get?value={value}")]
 	string GetData(int value);
+
+
+	// ParseScpiFile
+	// Purpose: This file simply verifies if a SCPI file syntax is valid.
+	//          A valid SCPI file should identify the equipment device to be valid.
+	//          One exception are 'common' command files
+	[OperationContract]
+	[WebGet(UriTemplate = "VerifyConfigFile?filePath={filePath}")]
+	bool VerifyConfigFile(string filePath);
+
+	
 }
