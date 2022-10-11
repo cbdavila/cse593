@@ -2,41 +2,38 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.ServiceModel;
-using System.ServiceModel.Web;
-using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 
 // NOTE: You can use the "Rename" command on the "Refactor" menu to change the class name "Service" in code, svc and config file together.
 public class SCPIVerifier : ISCPIVerifier
-{
-	public string GetData(int value)
+{ 
+
+
+	public string[] GetTestFiles()
 	{
-		return string.Format("You entered: {0}", value);
+
+		string workingDirectory = AppDomain.CurrentDomain.GetData("DataDirectory").ToString();
+		string[] files = Directory.GetFiles(workingDirectory);
+		for(int i =0; i < files.Length; i++)
+        {
+			files[i] = Path.GetFileName(files[i]);
+        }
+
+		
+
+		return files;
 	}
 
 	public bool VerifyConfigFile(string filePath)
     {
-		// TODO:
-	//	1.Parse "device"
-	//		a.Parse "commands"
-	//			i.Parse "command"
-	//				1) Parse "parameters"
-	//					a)Parse "Parameter"
 
 		bool valid = false;
 
-		// read the file
-
-		// check syntax
-		//verifyScpiString(line, typeOfDevice);
 		StreamReader sReader = new StreamReader(filePath);
 		using (sReader)
 		{
-			//XDocument xDoc = XDocument.Parse(sReader.ReadToEnd().ToString());
-
+ 
 			if (sReader.BaseStream.Position > 0)
 			{
 				sReader.BaseStream.Position = 0;
@@ -50,16 +47,17 @@ public class SCPIVerifier : ISCPIVerifier
 				{
 					XElement root = xDoc.Root;
 					string deviceName = root.Attribute("name").Value;
-					string model = root.Attribute("model").Value;
-					string manufacturer = root.Attribute("manufacturer").Value;
+					
 
 					// common
 					if (deviceName == "common")
 					{
-						// parse common commands file
+						valid = true;
 					}
 					else
 					{
+						string model = root.Attribute("model").Value;
+						string manufacturer = root.Attribute("manufacturer").Value;
 						// actual equipment config files
 						// commands
 						IEnumerable<XElement> tmpCmd = root.Elements("commands");
@@ -96,7 +94,8 @@ public class SCPIVerifier : ISCPIVerifier
 											string max = param.Attribute("max").Value;
 										}										
                                     }
-                                }
+									valid = true;
+								}
 								// command parameters
 							}
 
@@ -105,7 +104,7 @@ public class SCPIVerifier : ISCPIVerifier
 							// iterate over each parameter
 							//e.Element("parameter").Attribute("max").Value
 							
-							valid = true;
+							//valid = true;
 						}
 					}
 				}

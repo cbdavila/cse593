@@ -14,6 +14,7 @@ namespace CommandAndControl.Controllers
     {
 
         public static Boolean validFile = false;
+        public static string[] fileNames;
 
 
         [HttpGet]
@@ -52,6 +53,53 @@ namespace CommandAndControl.Controllers
         {
             ViewBag.Message = "These tools are used for quick verification of custom files to minimize errors at run time ";
             ViewBag.FileStatus = "No file loaded";
+            ViewBag.FileNames = new string[] { };
+            
+            // Query the 'test files' available to test located in server directories.
+
+            try
+            {
+
+                string appData = Server.MapPath("~/App_Data");
+                //string[] testFiles = Directory.GetFiles(appData);
+                string FullUrl = "http://localhost:58974/SCPIVerifier.svc/GetTestFiles?";
+                HttpWebRequest req1 = (HttpWebRequest)HttpWebRequest.Create(new Uri(FullUrl));
+                HttpWebResponse response = (HttpWebResponse)req1.GetResponse();
+
+                StreamReader sReader;
+                using (sReader = new StreamReader(response.GetResponseStream()))
+                {
+                    string str = sReader.ReadToEnd().ToString();
+                    str = str.Replace("ArrayOfstring", "ArrayOfString");
+                    XDocument xDoc = XDocument.Parse(str);
+
+                    XElement root = xDoc.Root;
+
+                    IEnumerable<XElement> tmpParams = root.Elements();
+                    List<string> fileList = new List<string>();
+
+                    foreach (XElement param in tmpParams)
+                    {
+                        string value = param.Value;
+                        value = value.Replace(".xml", ".config");
+                        fileList.Add(value);
+                    }
+
+                    fileNames = fileList.ToArray<string>();
+
+                    fileNames.Select(s => new SelectListItem { Value = s }).ToList();
+                    ViewBag.FileNames = fileNames;
+                    
+
+
+
+                }
+            }
+            catch
+            {
+                ViewBag.Message = "Could not get equipment config files";
+            }
+
             return View();
         }
          
@@ -60,6 +108,7 @@ namespace CommandAndControl.Controllers
         {
             ViewBag.FileStatus = "No file loaded";
             string absPath = "";
+            
             try
             {
                 if (fileName.filePath != null)
@@ -67,10 +116,7 @@ namespace CommandAndControl.Controllers
                     absPath = Path.Combine(Server.MapPath("~/App_Data"), fileName.filePath);
                     
                     string file = Path.GetFileName(absPath);
-
-                    //fileName.SaveAs(_path);
                 }
-                // filePath={filePath}&typeOfDevice={typeOfDevice}
                 string baseUrl = "http://localhost:58974/SCPIVerifier.svc/VerifyConfigFile?filePath=";
                 string FullUrl = baseUrl + absPath;
                 HttpWebRequest req1 = (HttpWebRequest)HttpWebRequest.Create(new Uri(FullUrl));
@@ -95,26 +141,16 @@ namespace CommandAndControl.Controllers
                 }
 
             }
-            catch
+            catch(Exception e)
             {
-                ViewBag.Message = "File upload failed!!";
+                
+                string msg = e.ToString();
+                ViewBag.FileStatus = "File upload failed ! :" + msg;
                 //return View();
             }
-            // verify the file exists
-            //if (fileName.filePath != null)
-            //{
-            //    // Verify the file is not empty
-
-            //    // If not empty send the file to the service to be parsed and verified
-            //    string baseUrl = "http://http://localhost:58974/SCPIVerifier.svc/Get?value=" + fileName.filePath;
-            //    HttpWebRequest hwReq1 = (HttpWebRequest)HttpWebRequest.Create(new Uri(baseUrl));
-            //    hwReq1.BeginGetResponse(new AsyncCallback(myCallbackFunc), hwReq1);
-
-
-            //}
-            // determine file type
 
             // parse the file
+            ViewBag.FileNames = fileNames;
             return View();
         }
         private static void myCallbackFunc(IAsyncResult requestObj)

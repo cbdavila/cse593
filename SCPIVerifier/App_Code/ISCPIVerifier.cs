@@ -12,8 +12,8 @@ public interface ISCPIVerifier
 {
 
 	[OperationContract]
-	[WebGet(UriTemplate="Get?value={value}")]
-	string GetData(int value);
+	[WebGet(UriTemplate="GetTestFiles?")]
+	string[] GetTestFiles();
 
 
 	// ParseScpiFile
