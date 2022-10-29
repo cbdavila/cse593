@@ -48,22 +48,9 @@
                         <input type="submit" value="Submit">
                     }
                 </div>
-
-
-                @*@using (Html.BeginForm("SyntaxVerifier", "Home", FormMethod.Post))
-                {
-                    <div class="panel panel-success">
-                        <div class="panel-body">
-                            <select name="filePath" id="myFile">
-                                @foreach (var str in ViewBag.FileNames)
-                                {
-                                    <option value="@Html.Raw(str) "> @Html.Raw(str)</option>
-                                }
-                            </select>
-                        </div>
-                        <input type="submit" value="Submit">
-                    </div>
-                }*@
+                <div>
+                    <label>@ViewBag.DeviceStatus</label>
+                </div>
 
 
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using CommandAndControl.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -19,7 +20,7 @@ public interface IService
 
 	[OperationContract]
 	[WebGet(UriTemplate = "executeSCPI?deviceName={deviceName}&command={command}")]
-	bool executeSCPI(string deviceName, string command);
+	CommandMessage executeSCPI(string deviceName, string command);
 }
 
 // Use a data contract as illustrated in the sample below to add composite types to service operations.

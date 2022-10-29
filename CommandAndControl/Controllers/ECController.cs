@@ -6,7 +6,9 @@ using System.Linq;
 using System.Net;
 using System.Web;
 using System.Web.Mvc;
+using System.Xml;
 using System.Xml.Linq;
+using System.Xml.Serialization;
 
 namespace CommandAndControl.Controllers
 {
@@ -46,10 +48,14 @@ namespace CommandAndControl.Controllers
         [HttpPost]
         public ActionResult EquipmentControl(SCPICommand scpiCommand)
         {
+            CommandMessage cmdMessage = new CommandMessage
+            {
+                message = "NoGood",
+                pass = false
+            };
 
             try
             {
-                //string FullUrl = "http://localhost:60719/Service.svc/executeSCPI?deviceName={deviceName}&command={command}";
                 string FullUrl = "http://localhost:60719/Service.svc/executeSCPI?deviceName=";
                 FullUrl = FullUrl + scpiCommand.device + "&command=" + scpiCommand.command;
 
@@ -57,37 +63,43 @@ namespace CommandAndControl.Controllers
                 HttpWebResponse response = (HttpWebResponse)req1.GetResponse();
 
                 StreamReader sReader;
+                sReader = new StreamReader(response.GetResponseStream());
                 using (sReader = new StreamReader(response.GetResponseStream()))
                 {
-
+                    // painfully parse object
                     XDocument xDoc = XDocument.Parse(sReader.ReadToEnd().ToString());
-                    XElement xElem = xDoc.Root;
-                    string pass = xElem.Value;
-                    if (pass == "true")
-                    {
-                        ViewBag.FileStatus = "Command Executed Successfully";
 
-                    }
-                    else
-                    {
-                        ViewBag.FileStatus = "Command Failed To Executed!";
-                    }
+                    List<XNode> l = xDoc.DescendantNodes().ToList();
+                    XNode node2 = l[2];
+                    XNode node4 = l[4];
+
+                    string msg = node2.ToString();
+                    string pass = node4.ToString();
+
+                    cmdMessage.message = msg;
+                    cmdMessage.pass = pass == "true" ? true : false;
 
                 }
+                
             }
-            catch
+            catch(Exception e)
             {
-                ViewBag.Message = "Could execute command : " + scpiCommand.command + " for device : " + scpiCommand.device ;
+                string msg = e.Message;
+                ViewBag.DeviceStatus = "Could execute command : " + scpiCommand.command + " for device : " + scpiCommand.device ;
             }
 
-
-
-
+            if (cmdMessage.pass)
+            {
+                ViewBag.DeviceStatus = "Command Executed Successfully";
+            }
+            else
+            {
+                ViewBag.DeviceStatus = cmdMessage.message;
+            }
             ViewBag.deviceList = deviceList;
 
-
             // send command requipt to equipment control service
-            ViewBag.Message = "This is the Equipment Control page";
+            //ViewBag.Message = "This is the Equipment Control page";
 
             return View();
         }
@@ -96,9 +108,7 @@ namespace CommandAndControl.Controllers
         {
             try
             {
-
                 string appData = Server.MapPath("~/App_Data");
-                //string[] testFiles = Directory.GetFiles(appData);
                 string FullUrl = "http://localhost:58974/SCPIVerifier.svc/GetTestFiles?";
                 HttpWebRequest req1 = (HttpWebRequest)HttpWebRequest.Create(new Uri(FullUrl));
                 HttpWebResponse response = (HttpWebResponse)req1.GetResponse();

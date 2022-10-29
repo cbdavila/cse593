@@ -7,6 +7,7 @@ using System.ServiceModel;
 using System.ServiceModel.Web;
 using System.Text;
 using System.Threading;
+using CommandAndControl.Models;
 
 // NOTE: You can use the "Rename" command on the "Refactor" menu to change the class name "Service" in code, svc and config file together.
 public class Service : IService
@@ -28,17 +29,30 @@ public class Service : IService
 		}
 		return composite;
 	}
-    public bool executeSCPI(string deviceName, string command)
+    public CommandMessage executeSCPI(string deviceName, string command)
     {
-        bool executed = false;
+        //bool executed = false;
+        CommandMessage cmdMessage = null;
+
         // send the command string to remote device
-        openDeviceSocketConnection(deviceName, command);
-        executed = true;
-        return executed;
+        cmdMessage = openDeviceSocketConnection(deviceName, command);
+        //if(cmdMessage.pass)
+        //{
+        //    executed = true;
+        //}
+
+        //return executed;
+        return cmdMessage;
     }
-    public bool openDeviceSocketConnection(string deviceName, string command)
+    public CommandMessage openDeviceSocketConnection(string deviceName, string command)
     {
-        bool pass = false;
+        CommandMessage cmdMessage = new CommandMessage
+        {
+            message = "NoGood",
+            pass = false
+        };
+
+        //string pass = "NoGood";
         try
         {
             TcpClient client = new TcpClient("localhost", 12345);
@@ -66,18 +80,27 @@ public class Service : IService
 
             if(responseData == "Good")
             {
-                pass = true;
+                //pass = "Good";
+                cmdMessage.message = "Good";
+                cmdMessage.pass = true;
             }
+
+            //pass = responseData;
+            cmdMessage.message = responseData;
         }
         catch (ArgumentNullException e)
         {
             Console.WriteLine("ArgumentNullException: {0}", e);
+            cmdMessage.message = e.Message;
+
+
         }
         catch (SocketException e)
         {
             Console.WriteLine("SocketException: {0}", e);
+            cmdMessage.message = e.Message;
         }
 
-        return pass;
+        return cmdMessage;
     }
 }
