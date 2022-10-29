@@ -27,12 +27,25 @@
 #include <sys/types.h> 
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <signal.h>
+
+// Global variables
+static volatile sig_atomic_t running = 1;
+
+// Global functions
+static void handleSignal(int sig)
+{
+	(void)sig;
+	running = 0;
+}
 
 void error(const char *msg)
 {
     perror(msg);
     exit(1);
 }
+
+
 
 int main(int argc, char *argv[])
 {
@@ -63,22 +76,29 @@ int main(int argc, char *argv[])
 	listen(mainSocketFd,5);
     clilen = sizeof(cli_addr);
 	 
-	 
-    clientSocketFd = accept(mainSocketFd, 
-                 (struct sockaddr *) &cli_addr, 
-                 &clilen);
-    if (clientSocketFd < 0) 
-          error("ERROR on accept");
-    bzero(buffer,256);
-	
-    printf("socket connection accepted\n");
-	
-	n = read(clientSocketFd,buffer,255);
-    if (n < 0) error("ERROR reading from socket");
-    printf("Here is the message: %s\n",buffer);
-    n = write(clientSocketFd,"I got your message",18);
-    if (n < 0) error("ERROR writing to socket");
-    close(clientSocketFd);
+	while(running)
+    {		
+		clientSocketFd = accept(mainSocketFd, 
+					 (struct sockaddr *) &cli_addr, 
+					 &clilen);
+		if (clientSocketFd < 0) 
+			  error("ERROR on accept");
+		bzero(buffer,256);
+		
+		printf("socket connection accepted\n");
+		
+		n = read(clientSocketFd,buffer,255);
+		if (n < 0) 
+			error("ERROR reading from socket");
+		
+		printf("Here is the message: %s\n",buffer);
+		n = write(clientSocketFd,"I got your message",18);
+		
+		if (n < 0) 
+			error("ERROR writing to socket");
+		
+		close(clientSocketFd);
+	}
     close(mainSocketFd);
     return 0; 
 }

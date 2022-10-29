@@ -39,66 +39,55 @@ namespace CommandAndControl.Controllers
             return View();
         }
 
-        
-        [HttpGet]
-        public ActionResult EquipmentControl()
-        {
-            ViewBag.Message = "This is the Equipment Control page";
-
-            return View();
-        }
-
         [HttpGet]
         public ActionResult SyntaxVerifier()
         {
             ViewBag.Message = "These tools are used for quick verification of custom files to minimize errors at run time ";
             ViewBag.FileStatus = "No file loaded";
             ViewBag.FileNames = new string[] { };
-            
+
             // Query the 'test files' available to test located in server directories.
 
-            try
-            {
+            GetConfigFileList();
+            ViewBag.FileNames = fileNames;
+            //try
+            //{
 
-                string appData = Server.MapPath("~/App_Data");
-                //string[] testFiles = Directory.GetFiles(appData);
-                string FullUrl = "http://localhost:58974/SCPIVerifier.svc/GetTestFiles?";
-                HttpWebRequest req1 = (HttpWebRequest)HttpWebRequest.Create(new Uri(FullUrl));
-                HttpWebResponse response = (HttpWebResponse)req1.GetResponse();
+            //    string appData = Server.MapPath("~/App_Data");
+            //    //string[] testFiles = Directory.GetFiles(appData);
+            //    string FullUrl = "http://localhost:58974/SCPIVerifier.svc/GetTestFiles?";
+            //    HttpWebRequest req1 = (HttpWebRequest)HttpWebRequest.Create(new Uri(FullUrl));
+            //    HttpWebResponse response = (HttpWebResponse)req1.GetResponse();
 
-                StreamReader sReader;
-                using (sReader = new StreamReader(response.GetResponseStream()))
-                {
-                    string str = sReader.ReadToEnd().ToString();
-                    str = str.Replace("ArrayOfstring", "ArrayOfString");
-                    XDocument xDoc = XDocument.Parse(str);
+            //    StreamReader sReader;
+            //    using (sReader = new StreamReader(response.GetResponseStream()))
+            //    {
+            //        string str = sReader.ReadToEnd().ToString();
+            //        str = str.Replace("ArrayOfstring", "ArrayOfString");
+            //        XDocument xDoc = XDocument.Parse(str);
 
-                    XElement root = xDoc.Root;
+            //        XElement root = xDoc.Root;
 
-                    IEnumerable<XElement> tmpParams = root.Elements();
-                    List<string> fileList = new List<string>();
+            //        IEnumerable<XElement> tmpParams = root.Elements();
+            //        List<string> fileList = new List<string>();
 
-                    foreach (XElement param in tmpParams)
-                    {
-                        string value = param.Value;
-                        value = value.Replace(".xml", ".config");
-                        fileList.Add(value);
-                    }
+            //        foreach (XElement param in tmpParams)
+            //        {
+            //            string value = param.Value;
+            //            value = value.Replace(".xml", ".config");
+            //            fileList.Add(value);
+            //        }
 
-                    fileNames = fileList.ToArray<string>();
+            //        fileNames = fileList.ToArray<string>();
 
-                    fileNames.Select(s => new SelectListItem { Value = s }).ToList();
-                    ViewBag.FileNames = fileNames;
-                    
-
-
-
-                }
-            }
-            catch
-            {
-                ViewBag.Message = "Could not get equipment config files";
-            }
+            //        fileNames.Select(s => new SelectListItem { Value = s }).ToList();
+            //        ViewBag.FileNames = fileNames;
+            //    }
+            //}
+            //catch
+            //{
+            //    ViewBag.Message = "Could not get equipment config files";
+            //}
 
             return View();
         }
@@ -162,6 +151,48 @@ namespace CommandAndControl.Controllers
             {
                 //get the secret number 
                 str = sReader.ReadToEnd().ToString();
+            }
+        }
+
+        public void GetConfigFileList()
+        {
+            try
+            {
+
+                string appData = Server.MapPath("~/App_Data");
+                //string[] testFiles = Directory.GetFiles(appData);
+                string FullUrl = "http://localhost:58974/SCPIVerifier.svc/GetTestFiles?";
+                HttpWebRequest req1 = (HttpWebRequest)HttpWebRequest.Create(new Uri(FullUrl));
+                HttpWebResponse response = (HttpWebResponse)req1.GetResponse();
+
+                StreamReader sReader;
+                using (sReader = new StreamReader(response.GetResponseStream()))
+                {
+                    string str = sReader.ReadToEnd().ToString();
+                    str = str.Replace("ArrayOfstring", "ArrayOfString");
+                    XDocument xDoc = XDocument.Parse(str);
+
+                    XElement root = xDoc.Root;
+
+                    IEnumerable<XElement> tmpParams = root.Elements();
+                    List<string> fileList = new List<string>();
+
+                    foreach (XElement param in tmpParams)
+                    {
+                        string value = param.Value;
+                        value = value.Replace(".xml", ".config");
+                        fileList.Add(value);
+                    }
+
+                    fileNames = fileList.ToArray<string>();
+
+                    fileNames.Select(s => new SelectListItem { Value = s }).ToList();
+                    //ViewBag.FileNames = fileNames;
+                }
+            }
+            catch
+            {
+                ViewBag.Message = "Could not get equipment config files";
             }
         }
     }

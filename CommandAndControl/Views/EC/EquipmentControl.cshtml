@@ -1,0 +1,74 @@
+﻿@{
+    ViewBag.Title = "Equipment Control";
+}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width" />
+        <title>@ViewBag.Title</title>
+        <link rel="stylesheet" href="/css/styles.css" />
+        <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.css" />
+    </head>
+    <body>
+        <div class="container">
+
+            @*<div class="row">
+                <div class="panel panel-success">
+                    <div class="col-md-12">
+                        <select name="filePath" id="myFile">
+                            @foreach (var str in ViewBag.FileNames)
+                            {
+                                <option value="@Html.Raw(str) "> @Html.Raw(str)</option>
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>*@
+            <div class="row">
+                <div class="col-md-12">
+                    @using (Html.BeginForm("EquipmentControl", "EC", FormMethod.Post))
+                    {
+
+                        <h2>SCPI Command Tester</h2>
+
+                        <label for="deviceName">Select a device </label>
+                        <br />
+                        <select name="device" @*id="myFile"*@>
+                            @foreach (var str in ViewBag.deviceList)
+                            {
+                                <option value="@Html.Raw(str) "> @Html.Raw(str)</option>
+                            }
+                        </select>
+                        <br />
+                        <br />
+                        <label for="scpiCommand"> Enter a valid SCPI command string</label>
+                        <br />
+
+                        <textarea name="command" placeholder="Enter a SCPI command" style="width: 100%; max-width: 100%"> </textarea>
+                        <input type="submit" value="Submit">
+                    }
+                </div>
+
+
+                @*@using (Html.BeginForm("SyntaxVerifier", "Home", FormMethod.Post))
+                {
+                    <div class="panel panel-success">
+                        <div class="panel-body">
+                            <select name="filePath" id="myFile">
+                                @foreach (var str in ViewBag.FileNames)
+                                {
+                                    <option value="@Html.Raw(str) "> @Html.Raw(str)</option>
+                                }
+                            </select>
+                        </div>
+                        <input type="submit" value="Submit">
+                    </div>
+                }*@
+
+
+
+            </div>
+        </div>
+    </body>
+</html>
+

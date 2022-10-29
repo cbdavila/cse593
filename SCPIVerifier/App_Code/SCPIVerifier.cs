@@ -60,7 +60,7 @@ public class SCPIVerifier : ISCPIVerifier
 						string manufacturer = root.Attribute("manufacturer").Value;
 						// actual equipment config files
 						// commands
-						IEnumerable<XElement> tmpCmd = root.Elements("commands");
+						IEnumerable<XElement> tmpCmd = root.Elements("commands"); 
 						if (tmpCmd != null)
                         {
 							string cmdString = "";
