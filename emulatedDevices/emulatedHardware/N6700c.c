@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
 			error("ERROR reading from socket");
 		
 		printf("Here is the message: %s\n",buffer);
-		n = write(clientSocketFd,"I got your message",18);
+		n = write(clientSocketFd,"Good",4);
 		
 		if (n < 0) 
 			error("ERROR writing to socket");

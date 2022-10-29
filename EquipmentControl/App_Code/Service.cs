@@ -32,16 +32,17 @@ public class Service : IService
     {
         bool executed = false;
         // send the command string to remote device
-        openDeviceSocketConnection();
+        openDeviceSocketConnection(deviceName, command);
         executed = true;
         return executed;
     }
-    public void openDeviceSocketConnection()
+    public bool openDeviceSocketConnection(string deviceName, string command)
     {
+        bool pass = false;
         try
         {
             TcpClient client = new TcpClient("localhost", 12345);
-            string message = "Hello world!";
+            string message = deviceName+":"+command;
             Byte[] data = System.Text.Encoding.ASCII.GetBytes(message);
             NetworkStream stream = client.GetStream();
 
@@ -63,10 +64,10 @@ public class Service : IService
             Int32 bytes = stream.Read(data, 0, data.Length);
             responseData = System.Text.Encoding.ASCII.GetString(data, 0, bytes);
 
-            // Explicit close is not necessary since TcpClient.Dispose() will be
-            // called automatically.
-            // stream.Close();
-            // client.Close();
+            if(responseData == "Good")
+            {
+                pass = true;
+            }
         }
         catch (ArgumentNullException e)
         {
@@ -76,5 +77,7 @@ public class Service : IService
         {
             Console.WriteLine("SocketException: {0}", e);
         }
+
+        return pass;
     }
 }
