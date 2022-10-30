@@ -4,19 +4,6 @@
 //          to be executed, and responds with whether command was executed successfully
 //          or not.
 
-// #include <stdio.h>
-// int main(int argc, char *argv[])
-// {
-  // printf("Hello world\n");
-// }
-
-
-
-// void error(const char *msg)
-// {
-    // perror(msg);
-    // exit(0);
-// }
 
 /* A simple server in the internet domain using TCP
    The port number is passed as an argument */
@@ -45,8 +32,6 @@ void error(const char *msg)
     exit(1);
 }
 
-
-
 int main(int argc, char *argv[])
 {
      int mainSocketFd, clientSocketFd, portno;
@@ -61,7 +46,9 @@ int main(int argc, char *argv[])
      mainSocketFd = socket(AF_INET, SOCK_STREAM, 0);
      if (mainSocketFd < 0) 
         error("ERROR opening socket");
+	
 	 printf("open socket successfully\n");
+	 
      bzero((char *) &serv_addr, sizeof(serv_addr));
      portno = atoi(argv[1]);
      serv_addr.sin_family = AF_INET;
