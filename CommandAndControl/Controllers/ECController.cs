@@ -8,6 +8,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.Schema;
 using System.Xml.Serialization;
 
 namespace CommandAndControl.Controllers
@@ -104,11 +105,56 @@ namespace CommandAndControl.Controllers
             return View();
         }
 
+        //borrowed below form page 205 of Dr Chens book
+        // Display any warnings or errors.
+        private static void ValidationCallBack(object sender, ValidationEventArgs args)
+        {
+            if (args.Severity == XmlSeverityType.Warning)
+                Console.WriteLine("\tWarning: Matching schema not found.  No validation occurred." + args.Message);
+            else
+                Console.WriteLine("\tValidation error: " + args.Message);
+        }
+
+
         public void GetConfigFileList()
         {
+
+            string returnMsg = "Error Detected";
+
+            string appData = AppDomain.CurrentDomain.GetData("DataDirectory").ToString();
+            //string appData = Server.MapPath("~/App_Data");
+
+            XmlSchemaSet schemaSet = new XmlSchemaSet();
+            //string deviceSchema = appData + "\\device.xsd";
+            schemaSet.Add(null, "https://www.public.asu.edu/~cbdavila/Project/device.xsd");
+            //schemaSet.Add(appData, "device.xsd");
+
+            // add the schema set to the reader settings for verifications
+            XmlReaderSettings settings = new XmlReaderSettings();
+            settings.ValidationType = ValidationType.Schema;
+            settings.Schemas = schemaSet;
+            settings.XmlResolver = new XmlUrlResolver();
+            settings.ValidationEventHandler += new ValidationEventHandler(ValidationCallBack);
+            settings.ValidationFlags |= XmlSchemaValidationFlags.ProcessInlineSchema;
+            settings.ValidationFlags |= XmlSchemaValidationFlags.ReportValidationWarnings;
+            //string XMLFileLocation = appData + "\\N6700C.config";
+            XmlReader rdr = XmlReader.Create("https://www.public.asu.edu/~cbdavila/Project/N6700C.config", settings);
+            XmlReader ccrdr = XmlReader.Create("https://www.public.asu.edu/~cbdavila/Project/CommonCommands.config", settings);
+            while (rdr.Read())
+            {
+                Console.WriteLine("Xml file is valid for the given xsd file");
+                returnMsg = "No Error";
+            }
+            while (ccrdr.Read())
+            {
+                Console.WriteLine("Xml file is valid for the given xsd file");
+                returnMsg = "No Error";
+            }
+            //return returnMsg;
+
             try
             {
-                string appData = Server.MapPath("~/App_Data");
+                //string appData = Server.MapPath("~/App_Data");
                 string FullUrl = "http://localhost:58974/SCPIVerifier.svc/GetTestFiles?";
                 HttpWebRequest req1 = (HttpWebRequest)HttpWebRequest.Create(new Uri(FullUrl));
                 HttpWebResponse response = (HttpWebResponse)req1.GetResponse();

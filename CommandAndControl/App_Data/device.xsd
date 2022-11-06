@@ -1,0 +1,63 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<xs:schema  elementFormDefault="qualified"  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <!--single device-->
+  <xs:element name="device" type ="deviceType"> </xs:element>
+  
+    <xs:complexType name="deviceType">
+      <xs:sequence>
+        <xs:element name="commands" minOccurs="1" maxOccurs="unbounded" type="commandsType"> </xs:element>
+      </xs:sequence>
+      <xs:attribute name="name" type="xs:string" use="required"/>
+      <xs:attribute name="model" type="xs:string" use="optional"/>
+      <xs:attribute name="manufacturer" type="xs:string" use="optional"/>
+    </xs:complexType>
+
+  <!--many commands-->
+  <xs:complexType name="commandsType">
+    <xs:sequence>
+      <xs:element name="command" minOccurs="1" maxOccurs="unbounded" type="commandType"></xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  
+    <!--single command-->
+    <xs:complexType name="commandType">
+      <xs:choice>
+        <xs:element name="parameters" minOccurs="0" maxOccurs="unbounded" type="parametersType"></xs:element>
+      </xs:choice>
+      <xs:attribute name="cmdName" type="xs:string" use="required"/>
+      <xs:attribute name="scpi" type="xs:string" use="required"/>
+    </xs:complexType>
+
+  <!--many parameters-->
+  <xs:complexType name="parametersType">
+    <xs:sequence>
+      <xs:element name="parameter" minOccurs="1" maxOccurs="unbounded"  type="parameterType"></xs:element>
+    </xs:sequence>
+    <xs:attribute name="default" type="xs:string" use="optional"/>
+  </xs:complexType>
+
+  <!--single parameter-->
+  <xs:complexType name="parameterType">
+    <xs:choice>
+      <xs:element name="value" type="xs:string"></xs:element>
+    </xs:choice>
+    <xs:attribute name="min" type="xs:double" use="optional"/>
+    <xs:attribute name="max" type="xs:double" use="optional"/>
+    <xs:attribute name="power" type="powerOnType" use="optional"/>
+  </xs:complexType>
+
+  <!-- power type enum-->
+  <xs:simpleType name="powerOnType">
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="ON"></xs:enumeration>
+      <xs:enumeration value="OFF"></xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:schema>
+  
+
+<!--targetNamespace="http://tempuri.org/device.xsd"
+elementFormDefault="qualified"
+xmlns="http://tempuri.org/device.xsd"
+xmlns:mstns="http://tempuri.org/device.xsd"
+xmlns:xs="http://www.w3.org/2001/XMLSchema"-->
