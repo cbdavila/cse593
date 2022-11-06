@@ -12,6 +12,11 @@ public interface ISCPIVerifier
 {
 
 	[OperationContract]
+	[WebGet(UriTemplate = "ValidateConfigFiles?")]
+	bool ValidateConfigFiles();
+
+
+	[OperationContract]
 	[WebGet(UriTemplate="GetTestFiles?")]
 	string[] GetTestFiles();
 
@@ -24,5 +29,39 @@ public interface ISCPIVerifier
 	[WebGet(UriTemplate = "VerifyConfigFile?filePath={filePath}")]
 	bool VerifyConfigFile(string filePath);
 
+}
+
+// Use a data contract as illustrated in the sample below to add composite types to service operations.
+[DataContract]
+public class ValidType
+{
+	bool valid = true;
+	string errorMessage = "No Error";
+	[DataMember]
+	public bool boolValid
+	{
+		get { return valid; }
+		set { valid = value; }
+	}
+
+	public string errorString
+    {
+		get { return errorMessage; }
+		set { errorMessage = value;}
+    }
+
+}
+
+[DataContract]
+public class ValidFileLists
+{
+	// this list contains a list of all possible config files at startup, config files are removed if they are invalid.
+	List<string> configFiles = new List<string>() { "N6700C.config", "CommonCommands.config" };
+	public List<string> configFileList
+    {
+		get { return configFiles; }
+        set { configFiles = value; }
+    }
 	
 }
+

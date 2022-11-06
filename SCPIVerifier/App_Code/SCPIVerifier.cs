@@ -4,143 +4,134 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.Schema;
 
-// NOTE: You can use the "Rename" command on the "Refactor" menu to change the class name "Service" in code, svc and config file together.
+
+
 public class SCPIVerifier : ISCPIVerifier
-{ 
+{
+    public ValidType validType = new ValidType();
+    public ValidFileLists validFileLists = new ValidFileLists();
 
-
-	public string[] GetTestFiles()
-	{
-
-		string workingDirectory = AppDomain.CurrentDomain.GetData("DataDirectory").ToString();
-		string[] files = Directory.GetFiles(workingDirectory);
-		for(int i =0; i < files.Length; i++)
-        {
-			files[i] = Path.GetFileName(files[i]);
-        }
-
-		
-
-		return files;
-	}
-
-	public bool VerifyConfigFile(string filePath)
+    public bool ValidateConfigFiles()
     {
+        //string appData = AppDomain.CurrentDomain.GetData("DataDirectory").ToString();
+        XmlSchemaSet schemaSet = new XmlSchemaSet();
+        schemaSet.Add(null, "https://www.public.asu.edu/~cbdavila/Project/device.xsd");
+        // add the schema set to the reader settings for verifications
+        XmlReaderSettings settings = new XmlReaderSettings();
+        settings.ValidationType = ValidationType.Schema;
+        settings.Schemas = schemaSet;
+        settings.XmlResolver = new XmlUrlResolver();
+        settings.ValidationEventHandler += new ValidationEventHandler(ValidationCallBack);
+        settings.ValidationFlags |= XmlSchemaValidationFlags.ProcessInlineSchema;
+        settings.ValidationFlags |= XmlSchemaValidationFlags.ReportValidationWarnings;
 
-		bool valid = false;
+        XmlReader rdr;
+        string prefix = "https://www.public.asu.edu/~cbdavila/Project/";
+        List<string> unused = validFileLists.configFileList;
 
-		StreamReader sReader = new StreamReader(filePath);
-		using (sReader)
-		{
- 
-			if (sReader.BaseStream.Position > 0)
-			{
-				sReader.BaseStream.Position = 0;
-			}
-
-			try
-			{
-				XDocument xDoc = XDocument.Load(sReader);
-				// device
-				if (xDoc.Element("device") != null)
-				{
-					XElement root = xDoc.Root;
-					string deviceName = root.Attribute("name").Value;
-					
-
-					// common
-					if (deviceName == "common")
-					{
-						valid = true;
-					}
-					else
-					{
-						string model = root.Attribute("model").Value;
-						string manufacturer = root.Attribute("manufacturer").Value;
-						// actual equipment config files
-						// commands
-						IEnumerable<XElement> tmpCmd = root.Elements("commands"); 
-						if (tmpCmd != null)
-                        {
-							string cmdString = "";
-							string scpiString = "";
-							IEnumerable<XElement> commands = tmpCmd.Elements("command");
-							foreach (XElement command in commands)
-							{
-								//command
-								if (command.HasAttributes)
-								{
-									cmdString = command.Attribute("cmdName").Value;
-									scpiString = command.Attribute("scpi").Value;
-								}
-								IEnumerable<XElement> tmpParams = command.Elements("parameters");
-								// parameters
-								if (tmpParams != null)
-                                {
-									if(tmpParams.First().HasAttributes)
-                                    {
-										string defaulValue = tmpParams.First().Attribute("default").Value;
-
-									}
-									// parameter
-									IEnumerable<XElement> parameters = tmpParams.Elements("parameter");
-									foreach (XElement param in parameters)
-                                    {
-										string value = param.Value;
-                                        if (param.HasAttributes)
-                                        {
-											string min = param.Attribute("min").Value;
-											string max = param.Attribute("max").Value;
-										}										
-                                    }
-									valid = true;
-								}
-								// command parameters
-							}
-
-							//IEnumerable<XElement> parameters = element.Descendants("parameters");
-							//var e = parameters.First();
-							// iterate over each parameter
-							//e.Element("parameter").Attribute("max").Value
-							
-							//valid = true;
-						}
-					}
-				}
-				
-			}catch(XmlException exc)
+        int configFileSize = validFileLists.configFileList.Count;
+        for (int i = 0; i < configFileSize; i++)
+        {
+            string full = prefix + unused[i];
+            rdr = XmlReader.Create(full, settings);
+            while (rdr.Read())
             {
-				string exceptionMessage = exc.Message;
+                //Console.WriteLine("Xml file is valid for the given xsd file");
             }
 
+            // If config file is invalid (e.g syntax, remove it from list)
+            if (validType.boolValid == false)
+            {
+                unused.RemoveAt(i);
+                // send the message to user
+                // validType.errorMessage
+            }
 
-		}
+        }
 
-		return valid;
+        return validType.boolValid;
+    }
+    public string[] GetTestFiles()
+    {
+        string[] files = validFileLists.configFileList.ToArray();
+        return files;
     }
 
-	// verifyScpiString
-	// Purpose: determines if a string is valid for the type of device entered
-	private bool verifyScpiString(string scpiString, string typeOfDevice)
+    // This function is meant to verify a single file
+    // The file can be any config file that is not already validated and in the recognized device lists
+    public bool VerifyConfigFile(string filePath)
     {
-		bool valid = false;
-
-		using (StreamReader sReader = new StreamReader(scpiString))
-		{
-			XDocument xDoc = XDocument.Parse(sReader.ReadToEnd().ToString());
-			XElement xElem = xDoc.Root;
-			//bool pend = xElem.Value;
-		}
+        bool valid = true;
 
 
-		return valid;
-	}
+        XmlSchemaSet schemaSet = new XmlSchemaSet();
+        schemaSet.Add(null, "https://www.public.asu.edu/~cbdavila/Project/device.xsd");
+        // add the schema set to the reader settings for verifications
+        XmlReaderSettings settings = new XmlReaderSettings();
+        settings.ValidationType = ValidationType.Schema;
+        settings.Schemas = schemaSet;
+        settings.XmlResolver = new XmlUrlResolver();
+        settings.ValidationEventHandler += new ValidationEventHandler(ValidationCallBack);
+        settings.ValidationFlags |= XmlSchemaValidationFlags.ProcessInlineSchema;
+        settings.ValidationFlags |= XmlSchemaValidationFlags.ReportValidationWarnings;
 
-	// loadAllDevices
-	// Purpose: reads and load all SCPI device files into memory. Executed on start up
-	private void loadAllDevices()
+        XmlReader rdr;
+        string prefix = "https://www.public.asu.edu/~cbdavila/Project/";
+
+
+        //string full = prefix + filePath;
+        rdr = XmlReader.Create(filePath, settings);
+        while (rdr.Read())
+        {
+            //Console.WriteLine("Xml file is valid for the given xsd file");
+        }
+
+        // If config file is invalid (e.g syntax, remove it from list)
+        if (validType.boolValid == false)
+        {
+            valid = false;
+        }
+
+
+        return valid;
+    }
+
+    // verifyScpiString
+    // Purpose: determines if a string is valid for the type of device entered
+    private bool verifyScpiString(string scpiString, string typeOfDevice)
+    {
+        bool valid = false;
+
+        using (StreamReader sReader = new StreamReader(scpiString))
+        {
+            XDocument xDoc = XDocument.Parse(sReader.ReadToEnd().ToString());
+            XElement xElem = xDoc.Root;
+            //bool pend = xElem.Value;
+        }
+
+
+        return valid;
+    }
+
+    // loadAllDevices
+    // Purpose: reads and load all SCPI device files into memory. Executed on start up
+    private void loadAllDevices()
     {
 
+    }
+
+    //borrowed below form page 205 of Dr Chens book
+    // Display any warnings or errors.
+    private void ValidationCallBack(object sender, ValidationEventArgs args)
+    {
+        validType.boolValid = false;
+        if (args.Severity == XmlSeverityType.Warning)
+            Console.WriteLine("\tWarning: Matching schema not found.  No validation occurred." + args.Message);
+        else
+            Console.WriteLine("\tValidation error: " + args.Message);
+
+        validType.errorString = args.Message;
     }
 }

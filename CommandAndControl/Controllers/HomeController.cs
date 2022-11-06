@@ -47,47 +47,12 @@ namespace CommandAndControl.Controllers
             ViewBag.FileNames = new string[] { };
 
             // Query the 'test files' available to test located in server directories.
+            // prompt user to select a file and validate it
 
+
+            ValidateConfigFileList();
             GetConfigFileList();
             ViewBag.FileNames = fileNames;
-            //try
-            //{
-
-            //    string appData = Server.MapPath("~/App_Data");
-            //    //string[] testFiles = Directory.GetFiles(appData);
-            //    string FullUrl = "http://localhost:58974/SCPIVerifier.svc/GetTestFiles?";
-            //    HttpWebRequest req1 = (HttpWebRequest)HttpWebRequest.Create(new Uri(FullUrl));
-            //    HttpWebResponse response = (HttpWebResponse)req1.GetResponse();
-
-            //    StreamReader sReader;
-            //    using (sReader = new StreamReader(response.GetResponseStream()))
-            //    {
-            //        string str = sReader.ReadToEnd().ToString();
-            //        str = str.Replace("ArrayOfstring", "ArrayOfString");
-            //        XDocument xDoc = XDocument.Parse(str);
-
-            //        XElement root = xDoc.Root;
-
-            //        IEnumerable<XElement> tmpParams = root.Elements();
-            //        List<string> fileList = new List<string>();
-
-            //        foreach (XElement param in tmpParams)
-            //        {
-            //            string value = param.Value;
-            //            value = value.Replace(".xml", ".config");
-            //            fileList.Add(value);
-            //        }
-
-            //        fileNames = fileList.ToArray<string>();
-
-            //        fileNames.Select(s => new SelectListItem { Value = s }).ToList();
-            //        ViewBag.FileNames = fileNames;
-            //    }
-            //}
-            //catch
-            //{
-            //    ViewBag.Message = "Could not get equipment config files";
-            //}
 
             return View();
         }
@@ -154,7 +119,38 @@ namespace CommandAndControl.Controllers
             }
         }
 
-        public void GetConfigFileList()
+        public bool ValidateSingleFile()
+        {
+            bool valid = false;
+
+            return valid;
+        }
+        // this simply updates the config file list
+        // I want to execute this on the service startup, not sure how to yet.
+        public void ValidateConfigFileList()
+        {
+            try
+            {
+                string appData = Server.MapPath("~/App_Data");
+                //string[] testFiles = Directory.GetFiles(appData);
+                string FullUrl = "http://localhost:58974/SCPIVerifier.svc/ValidateConfigFiles?";
+                HttpWebRequest req1 = (HttpWebRequest)HttpWebRequest.Create(new Uri(FullUrl));
+                HttpWebResponse response = (HttpWebResponse)req1.GetResponse();
+
+                StreamReader sReader;
+                using (sReader = new StreamReader(response.GetResponseStream()))
+                {
+                    string str = sReader.ReadToEnd().ToString();
+
+                }
+            }
+            catch
+            {
+                ViewBag.Message = "Could verify config files files";
+
+            }
+        }
+         public void GetConfigFileList()
         {
             try
             {

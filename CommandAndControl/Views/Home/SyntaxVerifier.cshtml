@@ -23,12 +23,10 @@
                 <div class="col-md-6">
 
                     <label for="fileNames"> Select a file</label>
-                    @*<select name="file" id="files">
-            @foreach (var str in ViewBag.FileNames)
-            {
-            <option value="@Html.Raw(str) "> @Html.Raw(str)</option>
-            }
-        </select>*@
+                    <!--<label for="file-input">-->
+                    @*<div>Click this div and select a file</div>*@
+                    <!--</label>-->
+                    @*<input type="file" id="file-input" />*@
 
                     @using (Html.BeginForm("SyntaxVerifier", "Home", FormMethod.Post))
                     {
@@ -44,10 +42,18 @@
                             <input type="submit" value="Submit">
                         </div>
                     }
-
+                    @using (Html.BeginForm("SyntaxVerifier", "Home", FormMethod.Post))
+                    {
+                        <div class="panel panel-success">
+                            <div class="panel-body">
+                                <input name="filePath" id="myFile" type="file" />
+                            </div>
+                            <input type="submit" value="Submit">
+                        </div>
+                    }
 
                     <div>
-                        <label>@ViewBag.DeviceStatus</label>
+                        <label>@ViewBag.FileStatus</label>
                     </div>
 
 

@@ -26,9 +26,9 @@ namespace CommandAndControl.Controllers
         public ActionResult EquipmentControl()
         {
             ViewBag.Message = "This is the Equipment Control page";
-
-
+            ValidateConfigFileList();
             GetConfigFileList();
+
             string[] tmpDevList = new string[deviceList.Length-1];
             int tmpDevCounter = 0;
             for (int i = 0; i < deviceList.Length; i++)
@@ -105,53 +105,35 @@ namespace CommandAndControl.Controllers
             return View();
         }
 
-        //borrowed below form page 205 of Dr Chens book
-        // Display any warnings or errors.
-        private static void ValidationCallBack(object sender, ValidationEventArgs args)
+
+        // this simply updates the config file list
+        // I want to execute this on the service startup, not sure how to yet.
+        public void ValidateConfigFileList()
         {
-            if (args.Severity == XmlSeverityType.Warning)
-                Console.WriteLine("\tWarning: Matching schema not found.  No validation occurred." + args.Message);
-            else
-                Console.WriteLine("\tValidation error: " + args.Message);
+            try
+            {
+                string appData = Server.MapPath("~/App_Data");
+                //string[] testFiles = Directory.GetFiles(appData);
+                string FullUrl = "http://localhost:58974/SCPIVerifier.svc/ValidateConfigFiles?";
+                HttpWebRequest req1 = (HttpWebRequest)HttpWebRequest.Create(new Uri(FullUrl));
+                HttpWebResponse response = (HttpWebResponse)req1.GetResponse();
+
+                StreamReader sReader;
+                using (sReader = new StreamReader(response.GetResponseStream()))
+                {
+                    string str = sReader.ReadToEnd().ToString();
+
+                }
+            }
+            catch
+            {
+                ViewBag.Message = "Could verify config files files";
+
+            }
         }
 
-
         public void GetConfigFileList()
-        {
-
-            string returnMsg = "Error Detected";
-
-            string appData = AppDomain.CurrentDomain.GetData("DataDirectory").ToString();
-            //string appData = Server.MapPath("~/App_Data");
-
-            XmlSchemaSet schemaSet = new XmlSchemaSet();
-            //string deviceSchema = appData + "\\device.xsd";
-            schemaSet.Add(null, "https://www.public.asu.edu/~cbdavila/Project/device.xsd");
-            //schemaSet.Add(appData, "device.xsd");
-
-            // add the schema set to the reader settings for verifications
-            XmlReaderSettings settings = new XmlReaderSettings();
-            settings.ValidationType = ValidationType.Schema;
-            settings.Schemas = schemaSet;
-            settings.XmlResolver = new XmlUrlResolver();
-            settings.ValidationEventHandler += new ValidationEventHandler(ValidationCallBack);
-            settings.ValidationFlags |= XmlSchemaValidationFlags.ProcessInlineSchema;
-            settings.ValidationFlags |= XmlSchemaValidationFlags.ReportValidationWarnings;
-            //string XMLFileLocation = appData + "\\N6700C.config";
-            XmlReader rdr = XmlReader.Create("https://www.public.asu.edu/~cbdavila/Project/N6700C.config", settings);
-            XmlReader ccrdr = XmlReader.Create("https://www.public.asu.edu/~cbdavila/Project/CommonCommands.config", settings);
-            while (rdr.Read())
-            {
-                Console.WriteLine("Xml file is valid for the given xsd file");
-                returnMsg = "No Error";
-            }
-            while (ccrdr.Read())
-            {
-                Console.WriteLine("Xml file is valid for the given xsd file");
-                returnMsg = "No Error";
-            }
-            //return returnMsg;
-
+        { 
             try
             {
                 //string appData = Server.MapPath("~/App_Data");
@@ -174,7 +156,7 @@ namespace CommandAndControl.Controllers
                     foreach (XElement param in tmpParams)
                     {
                         string value = param.Value;
-                        value = value.Replace(".xml", ".config");
+                    //    value = value.Replace(".xml", ".config");
                         fileList.Add(value);
                     }
 
