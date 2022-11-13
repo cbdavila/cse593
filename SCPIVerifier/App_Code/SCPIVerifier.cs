@@ -5,6 +5,8 @@ using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Schema;
+using System.Xml.Serialization;
+using CommandAndControl.Models;
 
 
 
@@ -12,7 +14,6 @@ public class SCPIVerifier : ISCPIVerifier
 {
     public ValidType validType = new ValidType();
     public ValidFileLists validFileLists = new ValidFileLists();
-
     public bool ValidateConfigFiles()
     {
         //string appData = AppDomain.CurrentDomain.GetData("DataDirectory").ToString();
@@ -94,9 +95,10 @@ public class SCPIVerifier : ISCPIVerifier
             valid = false;
         }
 
-
         return valid;
     }
+
+    //TODO: get deserialize xml object from deviceList
 
     // verifyScpiString
     // Purpose: determines if a string is valid for the type of device entered

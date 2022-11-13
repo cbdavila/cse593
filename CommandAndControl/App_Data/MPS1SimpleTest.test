@@ -1,8 +1,8 @@
 ﻿MPS1 Output ON
-LOG "Powered on MPS1"
+//LOG "Powered on MPS1"
 MPS1 Voltage 5.0
-LOG "Set MPS1 Voltage to 5.0"
+//LOG "Set MPS1 Voltage to 5.0"
 MPS1 Current 1.0
-LOG "Set MPS1 Current to 1.0"
+//LOG "Set MPS1 Current to 1.0"
 MPS1 Output OFF
-LOG "MPS1 Powered off"
+//LOG "MPS1 Powered off"

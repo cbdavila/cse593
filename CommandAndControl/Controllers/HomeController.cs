@@ -31,13 +31,6 @@ namespace CommandAndControl.Controllers
             return View();
         }
 
-        [HttpGet]
-        public ActionResult TestControl()
-        {
-            ViewBag.Message = "This is the Test Control web page";
-
-            return View();
-        }
 
         [HttpGet]
         public ActionResult SyntaxVerifier()

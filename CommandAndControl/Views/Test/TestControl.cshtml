@@ -1,0 +1,20 @@
+﻿@{
+    ViewBag.Title = "Test Control";
+}
+<h2>@ViewBag.Title.</h2>
+<h3>@ViewBag.Message</h3>
+
+
+@using (Html.BeginForm("TestControl", "Test", FormMethod.Post))
+{
+    <div class="panel panel-success">
+        <div class="panel-body">
+            <input name="filePath" id="myFile" type="file" />
+        </div>
+        <input type="submit" value="Submit">
+    </div>
+}
+
+<div>
+    <label>@ViewBag.FileStatus</label>
+</div>

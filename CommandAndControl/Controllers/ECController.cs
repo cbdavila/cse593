@@ -16,7 +16,9 @@ namespace CommandAndControl.Controllers
     public class ECController : Controller
     {
         public static string[] deviceList;
- 
+        public static List<deviceType> devices = new List<deviceType>();
+
+
         public ActionResult Index()
         {
             return View();
@@ -31,6 +33,9 @@ namespace CommandAndControl.Controllers
 
             string[] tmpDevList = new string[deviceList.Length-1];
             int tmpDevCounter = 0;
+            string absPath = "";
+            string file = "";
+            XmlSerializer serializer = new XmlSerializer(typeof(deviceType));
             for (int i = 0; i < deviceList.Length; i++)
             {
                 if(deviceList[i] != "CommonCommands.config")
@@ -38,9 +43,19 @@ namespace CommandAndControl.Controllers
                     tmpDevList[tmpDevCounter] = deviceList[i].Replace(".config", "");
                     tmpDevCounter++;
                 }
+                // parse all files at the App_Data directory path
+                absPath = Path.Combine(Server.MapPath("~/App_Data"), deviceList[i]);
+
+                file = Path.GetFileName(absPath);
+                deviceType deserializeDevice = (deviceType)serializer.Deserialize(new XmlTextReader(absPath));
+                devices.Add(deserializeDevice);
             }
             deviceList = tmpDevList;
             ViewBag.deviceList = deviceList;
+
+
+
+
 
 
             return View();

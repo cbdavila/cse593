@@ -21,6 +21,10 @@ public interface IService
 	[OperationContract]
 	[WebGet(UriTemplate = "executeSCPI?deviceName={deviceName}&command={command}")]
 	CommandMessage executeSCPI(string deviceName, string command);
+
+	[OperationContract]
+	[WebGet(UriTemplate = "executeSCPICommand?deviceName={deviceName}&command={command}&parameters={parameters}")]
+	CommandMessage executeSCPICommand(string deviceName, string command, string parameters);
 }
 
 // Use a data contract as illustrated in the sample below to add composite types to service operations.
