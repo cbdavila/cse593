@@ -14,7 +14,7 @@ using System.Xml.Schema;
 using CommandAndControl.Models;
 
 // NOTE: You can use the "Rename" command on the "Refactor" menu to change the class name "Service" in code, svc and config file together.
-public class Service : IService
+public class TestControl : ITestControl
 {
 	public bool RunTest(string filePath)
 	{
@@ -78,7 +78,7 @@ public class Service : IService
 
 				try
 				{
-					string FullUrl = "http://localhost:60719/Service.svc/executeSCPICommand?deviceName=";
+					string FullUrl = "http://localhost:60719/EquipmentControl.svc/executeSCPICommand?deviceName=";
 				//string valueString = "empty";
 					FullUrl = FullUrl + cmd.device + "&command=" + cmd.command+parameterString;
 

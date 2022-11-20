@@ -10,6 +10,6 @@ namespace CommandAndControl.Models
         public string command { get; set; }
         public string device { get; set; }
 
-        public List<string> valueList{get; set;}
+        public List<string> valueList = new List<string>();
     }
 }

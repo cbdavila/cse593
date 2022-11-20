@@ -44,7 +44,7 @@ namespace CommandAndControl.Controllers
 
                     string file = Path.GetFileName(absPath);
                 }
-                string baseUrl = "http://localhost:58911/Service.svc/RunTest?filePath=";
+                string baseUrl = "http://localhost:58911/TestControl.svc/RunTest?filePath=";
                 string FullUrl = baseUrl + absPath;
                 HttpWebRequest req1 = (HttpWebRequest)HttpWebRequest.Create(new Uri(FullUrl));
                 HttpWebResponse response = (HttpWebResponse)req1.GetResponse();

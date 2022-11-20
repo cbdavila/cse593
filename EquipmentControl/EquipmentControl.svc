@@ -1,0 +1,2 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="EquipmentControl" CodeBehind="~/App_Code/EquipmentControl.cs" 
+    Factory="System.ServiceModel.Activation.WebServiceHostFactory"%>

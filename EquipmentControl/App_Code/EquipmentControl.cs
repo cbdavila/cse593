@@ -11,7 +11,7 @@ using System.Xml.Schema;
 using CommandAndControl.Models;
 
 // NOTE: You can use the "Rename" command on the "Refactor" menu to change the class name "Service" in code, svc and config file together.
-public class Service : IService
+public class EquipmentControl : IEquipmentControl
 {
     public string GetData(int value)
     {
@@ -49,6 +49,8 @@ public class Service : IService
     public CommandMessage executeSCPICommand(string deviceName, string command, string parameters)
     {
         CommandMessage cmdMessage = null;
+        cmdMessage.pass = false;
+        cmdMessage.message = "No Command Executed";
         // look up actual SCPI command string
 
         // replace <PARAM> string with parameters

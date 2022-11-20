@@ -38,25 +38,23 @@ namespace CommandAndControl.Controllers
             XmlSerializer serializer = new XmlSerializer(typeof(deviceType));
             for (int i = 0; i < deviceList.Length; i++)
             {
-                if(deviceList[i] != "CommonCommands.config")
-                {
-                    tmpDevList[tmpDevCounter] = deviceList[i].Replace(".config", "");
-                    tmpDevCounter++;
-                }
                 // parse all files at the App_Data directory path
                 absPath = Path.Combine(Server.MapPath("~/App_Data"), deviceList[i]);
 
                 file = Path.GetFileName(absPath);
                 deviceType deserializeDevice = (deviceType)serializer.Deserialize(new XmlTextReader(absPath));
                 devices.Add(deserializeDevice);
+                if (deviceList[i] != "CommonCommands.config")
+                {
+                   // tmpDevList[tmpDevCounter] = deviceList[i].Replace(".config", "");
+                    
+                    tmpDevList[tmpDevCounter] = deserializeDevice.name;
+                    tmpDevCounter++;
+                }
+                
             }
             deviceList = tmpDevList;
             ViewBag.deviceList = deviceList;
-
-
-
-
-
 
             return View();
         }
@@ -66,14 +64,122 @@ namespace CommandAndControl.Controllers
         {
             CommandMessage cmdMessage = new CommandMessage
             {
-                message = "NoGood",
+                message = "NoGood\n",
                 pass = false
             };
 
+            string scpiCmdString = "";
+            scpiCommand.command = scpiCommand.command.Trim();
+            foreach (deviceType i in devices)
+            {
+                // validate device name
+                if (scpiCommand.device.Equals( i.name, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    cmdMessage.message = ("Device "+ scpiCommand.device+ " exists.\n");
+
+                    string[] str = scpiCommand.command.Split(' ');
+                    scpiCommand.command = str[0];
+                    // for remainder, these are consider parameters for values
+                    for(int j = 1; j < str.Length; j++)
+                    {
+                       scpiCommand.valueList.Add(str[j]);
+                    }
+
+                    // validate command for this device
+                    List<commandType> cmdStrings = i.commands.ToList();
+                    int itemLoc = 0;
+                    for(int j = 0; j < cmdStrings.Count; j++)
+                    {
+                        if(scpiCommand.command.Equals(cmdStrings[j].cmdName, StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            cmdMessage.message += ("valid command found\n");
+                            itemLoc = j;
+                            break;
+                        }
+                       
+                    }
+
+                    scpiCmdString = i.commands[itemLoc].scpi;
+                    int valueCount = 0;//= scpiCommand.valueList.Count;
+
+                    // validate parameters
+                    List < parameterType> paramList = i.commands[itemLoc].Items[0].parameter.ToList();
+                    for (int j = 0; j < paramList.Count; j++)
+                    {
+                        if (scpiCommand.command.Equals(("Output"), StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            if (scpiCommand.valueList[valueCount].Equals(paramList[j].power.ToString(), StringComparison.InvariantCultureIgnoreCase))
+                            {
+                                cmdMessage.message += ("valid parameter found\n");
+                                scpiCmdString = scpiCmdString.Replace("PARAM"+(valueCount + 1), paramList[j].power.ToString());
+                                //itemLoc = j;
+                                valueCount++;
+                                //break;
+                            }
+                            //else
+                            //{
+                            //    cmdMessage.message += ("invalid parameter\n");
+                            //    j = cmdStrings.Count;
+                            //}
+                        }
+                        else if (scpiCommand.command.Equals(("Voltage"), StringComparison.InvariantCultureIgnoreCase))
+                        {
+
+                            // check if is within min and max
+                            double min = paramList[j].min;
+                            double max = paramList[j].max;
+                            double val1 = double.Parse(scpiCommand.valueList[valueCount], System.Globalization.CultureInfo.InvariantCulture);
+                            //double val = (double)scpiCommand.valueList[valueCount];
+                            if ( min <= val1 && val1<=max)
+                            {
+                                scpiCmdString = scpiCmdString.Replace("PARAM" + (valueCount + 1), val1.ToString());
+                                valueCount++;
+
+                            }
+
+                        }
+                        else if (scpiCommand.command.Equals(("Current"), StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            double min = paramList[j].min;
+                            double max = paramList[j].max;
+                            double val1 = double.Parse(scpiCommand.valueList[valueCount], System.Globalization.CultureInfo.InvariantCulture);
+                            //double val = (double)scpiCommand.valueList[valueCount];
+                            if (min <= val1 && val1 <= max)
+                            {
+                                scpiCmdString = scpiCmdString.Replace("PARAM" + (valueCount + 1), val1.ToString());
+                                valueCount++;
+
+                            }
+                        }
+                        else
+                        {
+                           // command not valid, should not have reached this ever
+
+                        }
+
+                    }
+
+
+
+
+                    continue;
+                }
+                else
+                {
+                    cmdMessage.message = ("Device " + scpiCommand.device + " does not exist\n");
+                }
+               
+
+            }
+
+            // Verify Device, Command, and Parameters against the devices container
+
             try
             {
-                string FullUrl = "http://localhost:60719/Service.svc/executeSCPI?deviceName=";
-                FullUrl = FullUrl + scpiCommand.device + "&command=" + scpiCommand.command;
+                string FullUrl = "http://localhost:60719/EquipmentControl.svc/executeSCPI?deviceName=";
+                //FullUrl = FullUrl + scpiCommand.device + "&command=" + scpiCommand.command;
+                FullUrl = FullUrl + scpiCommand.device + "&command=" + scpiCmdString;
+
 
                 HttpWebRequest req1 = (HttpWebRequest)HttpWebRequest.Create(new Uri(FullUrl));
                 HttpWebResponse response = (HttpWebResponse)req1.GetResponse();

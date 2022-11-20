@@ -31,20 +31,28 @@
 
                         <h2>SCPI Command Tester</h2>
 
+
+
                         <label for="deviceName">Select a device </label>
                         <br />
                         <select name="device" @*id="myFile"*@>
                             @foreach (var str in ViewBag.deviceList)
                             {
-                                <option value="@Html.Raw(str) "> @Html.Raw(str)</option>
+                                <option value="@Html.Raw(str)"> @Html.Raw(str)</option>
                             }
                         </select>
                         <br />
+                        <h4>Example MPS1 commands</h4>
+                        <label>
+                            MPS1 Voltage 5.0<br />
+                            MPS1 Current 1.0<br />
+                            MPS1 Output OFF<br />
+                        </label>
                         <br />
                         <label for="scpiCommand"> Enter a valid SCPI command string</label>
                         <br />
 
-                        <textarea name="command" placeholder="Enter a SCPI command" style="width: 100%; max-width: 100%"> </textarea>
+                        <textarea name="command" placeholder="Enter a SCPI command" style="width: 100%; max-width: 100%"></textarea>
                         <input type="submit" value="Submit">
                     }
                 </div>
