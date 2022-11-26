@@ -3,3 +3,7 @@
 *pdb
 *dll
 *cache
+*.o
+*.pdb
+*.sln
+*.cache

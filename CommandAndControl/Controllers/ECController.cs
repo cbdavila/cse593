@@ -156,20 +156,13 @@ namespace CommandAndControl.Controllers
                            // command not valid, should not have reached this ever
 
                         }
-
                     }
-
-
-
-
                     continue;
                 }
                 else
                 {
                     cmdMessage.message = ("Device " + scpiCommand.device + " does not exist\n");
                 }
-               
-
             }
 
             // Verify Device, Command, and Parameters against the devices container
@@ -179,7 +172,6 @@ namespace CommandAndControl.Controllers
                 string FullUrl = "http://localhost:60719/EquipmentControl.svc/executeSCPI?deviceName=";
                 //FullUrl = FullUrl + scpiCommand.device + "&command=" + scpiCommand.command;
                 FullUrl = FullUrl + scpiCommand.device + "&command=" + scpiCmdString;
-
 
                 HttpWebRequest req1 = (HttpWebRequest)HttpWebRequest.Create(new Uri(FullUrl));
                 HttpWebResponse response = (HttpWebResponse)req1.GetResponse();
@@ -200,7 +192,6 @@ namespace CommandAndControl.Controllers
 
                     cmdMessage.message = msg;
                     cmdMessage.pass = pass == "true" ? true : false;
-
                 }
                 
             }

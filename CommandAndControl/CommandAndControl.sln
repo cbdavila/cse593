@@ -8,6 +8,7 @@ EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "TestControl", "..\TestControl\", "{4B72002D-DA8C-4E91-BADF-F71A037F7F2B}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.7.2"
+		ProjectReferences = "{bd4be789-fc79-439e-8f77-a0feffd063a5}|CommandAndControl.dll;"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_58911"
 		Debug.AspNetCompiler.PhysicalPath = "..\TestControl\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_58911\"
@@ -30,6 +31,7 @@ EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "SCPIVerifier(1)", "..\SCPIVerifier\", "{1B3E720D-DA8A-472C-B11E-38B340F724FF}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.7.2"
+		ProjectReferences = "{bd4be789-fc79-439e-8f77-a0feffd063a5}|CommandAndControl.dll;"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_58974"
 		Debug.AspNetCompiler.PhysicalPath = "..\SCPIVerifier\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_58974\"
@@ -57,6 +59,7 @@ EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "EquipmentControl", "..\EquipmentControl\", "{26DCF685-3190-4231-B663-02F2959FC584}"
 	ProjectSection(WebsiteProperties) = preProject
 		TargetFrameworkMoniker = ".NETFramework,Version%3Dv4.7.2"
+		ProjectReferences = "{bd4be789-fc79-439e-8f77-a0feffd063a5}|CommandAndControl.dll;"
 		Debug.AspNetCompiler.VirtualPath = "/localhost_60719"
 		Debug.AspNetCompiler.PhysicalPath = "..\EquipmentControl\"
 		Debug.AspNetCompiler.TargetPath = "PrecompiledWeb\localhost_60719\"

@@ -12,7 +12,9 @@ namespace CommandAndControl.Controllers
 {
     public class TestController : Controller
     {
-        // GET: Test
+        public static string[] deviceList;
+        public static List<deviceType> devices = new List<deviceType>();
+
         public ActionResult Index()
         {
             return View();
@@ -31,10 +33,11 @@ namespace CommandAndControl.Controllers
         [HttpPost]
         public ActionResult TestControl(FileName fileName)
         {
-            ViewBag.Message = "This is the Test Control web page";
+            //ViewBag.Message = "This is the Test Control web page";
 
             ViewBag.FileStatus = "No file loaded";
             string absPath = "";
+
 
             try
             {
