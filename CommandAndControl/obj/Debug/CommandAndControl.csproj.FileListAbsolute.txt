@@ -155,4 +155,3 @@ C:\Users\cbdavila\Desktop\ASU\CSE 593\Software\cse593\CommandAndControl\obj\Debu
 C:\Users\cbdavila\Desktop\ASU\CSE 593\Software\cse593\CommandAndControl\obj\Debug\CommandAndControl.csproj.CopyComplete
 C:\Users\cbdavila\Desktop\ASU\CSE 593\Software\cse593\CommandAndControl\obj\Debug\CommandAndControl.dll
 C:\Users\cbdavila\Desktop\ASU\CSE 593\Software\cse593\CommandAndControl\obj\Debug\CommandAndControl.pdb
-C:\Users\cbdavila\Desktop\ASU\CSE 593\Software\cse593\CommandAndControl\obj\Debug\CommandAndControl.csprojAssemblyReference.cache
