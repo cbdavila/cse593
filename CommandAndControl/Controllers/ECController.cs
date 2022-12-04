@@ -114,7 +114,7 @@ namespace CommandAndControl.Controllers
                                 scpiCmdString = scpiCmdString.Replace("PARAM"+(valueCount + 1), paramList[j].power.ToString());
                                 //itemLoc = j;
                                 valueCount++;
-                                //break;
+                                break;
                             }
                             //else
                             //{
